@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 #include "genetique.h"
 
 indiv_t creerIndiv(int taille, graphe *g) {
@@ -11,16 +12,23 @@ indiv_t creerIndiv(int taille, graphe *g) {
 	return result;
 }
 
+void detruireIndiv(indiv_t* indiv, int taille) {
+	for (int i = 0; i < taille; ++i) {
+		free(indiv[i].seq);
+	}
+}
+
 indiv_t creerIndivSeq(int *seq, int taille, graphe *g) {
 	indiv_t result;
 	result.taille = taille;
 	result.seq = (int *) malloc(sizeof(int) * taille);
-	printf("Seq dans individu : ");
+	//printf("Seq dans individu : ");
 	for (int i = 0; i < taille; ++i) {
 		result.seq[i] = seq[i];
-		printf("%d ", result.seq[i]);
+		//printf("%d ", result.seq[i]);
 	}
-	printf("\n");
+	free(seq);
+	//printf("\n");
 	result.distance = distanceIndiv(result, g);
 	return result;
 }
@@ -34,6 +42,11 @@ popu_t creerPopu(int taille, int tailleIndiv, graphe *g) {
 		result.popu[i] = creerIndiv(tailleIndiv, result.g);
 	}
 	return result;
+}
+
+void detruirePopu(popu_t *population) {
+	detruireIndiv(population->popu, population->taille);
+	detruireGraphe(&population->g);
 }
 
 void swapSeqIndiv(indiv_t *indiv, int nbswap) {
@@ -70,6 +83,17 @@ int maxtab(popu_t *population) {
 	for (int i = 0; i < population->taille; ++i) {
 		if (population->popu[i].distance > max) {
 			max = population->popu[i].distance;
+			res = i;
+		}
+	}
+	return res;
+}
+
+int mintab(popu_t *population) {
+	int min = INT_MAX, res = -1;
+	for (int i = 0; i < population->taille; ++i) {
+		if (population->popu[i].distance < min) {
+			min = population->popu[i].distance;
 			res = i;
 		}
 	}
@@ -187,7 +211,7 @@ int *mutationSeq(int *seq1, int *seq2, int taille) {
 		}
 	}
 
-	printf("Seq 1 : ");
+	/*printf("Seq 1 : ");
 	for (int j = 0; j < taille; ++j) {
 		printf("%d ", seq1[j]);
 	}
@@ -199,7 +223,7 @@ int *mutationSeq(int *seq1, int *seq2, int taille) {
 	for (int j = 0; j < taille; ++j) {
 		printf("%d ", res[j]);
 	}
-	printf("\n");
+	printf("\n");*/
 	return res;
 }
 
@@ -208,4 +232,13 @@ void mutationPopulation(popu_t *population, indiv_t *tabMutation, int nombreMuta
 		population->popu[maxtab(population)] = tabMutation[i];
 	}
 	printf("Mutation effectué !");
+}
+
+void mutationRandom(popu_t *population, int m, int nbSwap) {
+	int random = 0;
+	for (int i = 0; i < m; ++i) {
+		random = rand_a_b(0, population->taille);
+		swapSeqIndiv(&population->popu[random], nbSwap);
+		population->popu[random].distance = distanceIndiv(population->popu[random], population->g);
+	}
 }
