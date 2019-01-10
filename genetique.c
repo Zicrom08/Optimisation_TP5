@@ -65,6 +65,17 @@ int contienttab(int *tab, int taille, int x) {
 	return 0;
 }
 
+int maxtab(popu_t *population) {
+	int max = -1, res = -1;
+	for (int i = 0; i < population->taille; ++i) {
+		if (population->popu[i].distance > max) {
+			max = population->popu[i].distance;
+			res = i;
+		}
+	}
+	return res;
+}
+
 void genererSeq(int *seq, int taille) {
 	int swap = 0;
 	int indice_x = 0, indice_y = 0;
@@ -137,6 +148,7 @@ int *selectionIndiv(popu_t *population, int nbReprod) {
 		afficherIndiv(population->popu[k]);
 		printf("\n");
 	}
+	free(fitness);
 	return tab;
 }
 
@@ -144,56 +156,59 @@ indiv_t *mutationIndiv(popu_t *population, int *tabSelection, int nbReprod) {
 	indiv_t *tabMutation = (indiv_t *) malloc(sizeof(indiv_t) * nbReprod);
 	int *seqMut;
 	for (int i = 0; i < nbReprod; ++i) {
-		if (i % 2 == 0) {
-			seqMut = mutationSeq(population->popu[tabSelection[i]].seq, population->popu[tabSelection[i + 1]].seq,
-								 population->g->nbSommet);
-			tabMutation[i] = creerIndivSeq(seqMut, population->g->nbSommet, population->g);
-		} else {
-			seqMut = mutationSeq(population->popu[tabSelection[i]].seq, population->popu[tabSelection[i - 1]].seq,
+		{
+			seqMut = mutationSeq(population->popu[tabSelection[i]].seq,
+								 population->popu[tabSelection[(i % 2 == 0 ? i + 1
+																		   : i - 1)]].seq,
 								 population->g->nbSommet);
 			tabMutation[i] = creerIndivSeq(seqMut, population->g->nbSommet, population->g);
 		}
 	}
+	free(seqMut);
+	return tabMutation;
 }
 
 int *mutationSeq(int *seq1, int *seq2, int taille) {
 	int *res = (int *) malloc(sizeof(int) * taille);
-	unsigned int i = 0, indice = 0;
-	int tmp = 0;
-	while (i != taille / 2) {
-		res[i] = seq1[i];
-		i++;
+	unsigned int k, indice = 0;
+	for (k = 0; k < taille / 2; ++k) {
+		res[k] = seq1[k];
 	}
-	indice = i;
+	indice = k;
 
-	while (indice != taille - 1) {
-		if (i < taille && contienttab(res, taille, seq2[i]) == 0) {
-			tmp = seq2[i];
-			res[indice] = tmp;
+	while (indice != taille) {
+		if (k < taille && contienttab(res, indice, seq2[k]) == 0) {
+			res[indice] = seq2[k];
 			indice++;
-			i++;
+			k++;
 		} else {
-			if (i == taille - 1) {
-				i = 0;
+			if (k == taille - 1) {
+				k = 0;
 			} else {
-				i++;
+				k++;
 			}
 		}
 	}
-
 
 	printf("Seq 1 : ");
 	for (int j = 0; j < taille; ++j) {
 		printf("%d ", seq1[j]);
 	}
-	printf("\n Seq 2 : ");
+	printf("\nSeq 2 : ");
 	for (int j = 0; j < taille; ++j) {
 		printf("%d ", seq2[j]);
 	}
-	printf("\n Seq 3 : ");
+	printf("\nSeq 3 : ");
 	for (int j = 0; j < taille; ++j) {
 		printf("%d ", res[j]);
 	}
 	printf("\n");
 	return res;
+}
+
+void mutationPopulation(popu_t *population, indiv_t *tabMutation, int nombreMuta) {
+	for (int i = 0; i < nombreMuta; ++i) {
+		population->popu[maxtab(population)] = tabMutation[i];
+	}
+	printf("Mutation effectué !");
 }

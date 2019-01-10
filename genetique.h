@@ -34,6 +34,8 @@ double rand_0_1();
 
 int contienttab(int *, int, int);
 
+int maxtab(popu_t *);
+
 void swapSeqIndiv(indiv_t *, int);
 
 void genererSeq(int *, int);
@@ -45,6 +47,8 @@ int *selectionIndiv(popu_t *, int);
 indiv_t *mutationIndiv(popu_t *, int *, int);
 
 int *mutationSeq(int *, int *, int);
+
+void mutationPopulation(popu_t *, indiv_t *, int);
 
 
 #endif
