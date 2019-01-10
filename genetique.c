@@ -167,7 +167,7 @@ indiv_t *mutationIndiv(popu_t *population, int *tabSelection, int nbReprod) {
 
 int *mutationSeq(int *seq1, int *seq2, int taille) {
 	int *res = (int *) malloc(sizeof(int) * taille);
-	unsigned int k, indice = 0;
+	int k, indice = 0;
 	for (k = 0; k < taille / 2; ++k) {
 		res[k] = seq1[k];
 	}
@@ -179,7 +179,7 @@ int *mutationSeq(int *seq1, int *seq2, int taille) {
 			indice++;
 			k++;
 		} else {
-			if (k == taille - 1) {
+			if (k >= (taille - 1)) {
 				k = 0;
 			} else {
 				k++;
