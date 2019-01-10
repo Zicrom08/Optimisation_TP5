@@ -154,17 +154,14 @@ int *selectionIndiv(popu_t *population, int nbReprod) {
 
 indiv_t *mutationIndiv(popu_t *population, int *tabSelection, int nbReprod) {
 	indiv_t *tabMutation = (indiv_t *) malloc(sizeof(indiv_t) * nbReprod);
-	int *seqMut;
 	for (int i = 0; i < nbReprod; ++i) {
 		{
-			seqMut = mutationSeq(population->popu[tabSelection[i]].seq,
-								 population->popu[tabSelection[(i % 2 == 0 ? i + 1
-																		   : i - 1)]].seq,
-								 population->g->nbSommet);
-			tabMutation[i] = creerIndivSeq(seqMut, population->g->nbSommet, population->g);
+			tabMutation[i] = creerIndivSeq(mutationSeq(population->popu[tabSelection[i]].seq,
+													   population->popu[tabSelection[(i % 2 == 0 ? i + 1 : i - 1)]].seq,
+													   population->g->nbSommet), population->g->nbSommet,
+										   population->g);
 		}
 	}
-	free(seqMut);
 	return tabMutation;
 }
 

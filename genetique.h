@@ -13,8 +13,8 @@ typedef struct indiv_t {
 
 typedef struct popu_t {
 	indiv_t *popu;
-	int taille;
 	graphe *g;
+	int taille;
 } popu_t;
 
 
